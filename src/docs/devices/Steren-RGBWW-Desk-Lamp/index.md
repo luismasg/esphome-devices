@@ -1,6 +1,6 @@
 ---
 title: "Steren RGBWW Desk Lamp"
-date-published: 2025-01-23
+date-published: 2025-02-12
 type: light
 standard: global
 board: bk72xx
@@ -10,13 +10,16 @@ difficulty: 2
 
 # Steren 12W Multicolor LED Wi-Fi Desk Lamp
 
-The **Steren RGBWW Desk Lamp** is a smart desk lamp with a sleek design, offering RGB color control, dimming, and scene modes. It integrates with Tuya/Smart Life for seamless app control and smart home automation. It is also compatible with **ESPHome** after flashing firmware, making it a versatile addition to DIY smart home setups.
+The **Steren RGBWW Desk Lamp** is a smart desk lamp with a sleek design, offering RGB color control, dimming, and scene modes. It integrates with Tuya/Smart Life for seamless app control and smart home automation.
+
+I attempted to flash the chip multiple times, but my FTDI adapter couldn’t provide enough current for a successful process. In the end, I followed Digiblur’s Tuya Cloudcutter guide, which is referenced in the ESPHome documentation for BK72xx, and that did the trick.
 
 ## Device Details
 
 - **Model**: SHOME-LAM
-- **Board**: BK7231 (wb3l variant)
+- **Board**: BK7231 (WB3L variant) ![pinout](https://docs.libretiny.eu/boards/wb3l/wb3l.svg)
 - **Power**: 12W
+- **Link**: [Lámpara LED Wi-Fi\* RGB+W multicolor de 12 W](https://www.steren.com.mx/lampara-led-wi-fi-multicolor-para-escritorio-de-12-w.html)
 
 ## Features
 
@@ -30,13 +33,13 @@ This lamp uses a BK7231, making it flashable with **ESPHome** .
 
 ## Images
 
-![Placeholder for Lamp Image - Front](image-placeholder-front.png)
-_Front view of the lamp showing its sleek design._
+![Promotional image from website](box.jpg)
+_Promotional image from website._
 
-![Placeholder for Lamp Image - Back](image-placeholder-back.png)
-_Back view showing connectivity and power input._
+![Placeholder for Lamp Image - Front](open.jpg)
+_Unscrew the diffuser. The board is connected to the power source via a connector._
 
-![Placeholder for Circuit Board](image-placeholder-circuit-board.png)
+![Placeholder for Circuit Board](pcb1.jpg)
 _Internal circuit board showcasing the chipset._
 
 ## Pinout and Configuration
@@ -60,53 +63,11 @@ _Internal circuit board showcasing the chipset._
 ### Final YAML Configuration
 
 ```yaml
-substitutions:
-  name: bolita
-  friendly_name: "Bolita"
-
-esphome:
-  name: ${name}
-  name_add_mac_suffix: false
-  friendly_name: ${friendly_name}
-
 bk72xx:
   board: wb3l
 
-# Enable logging
-logger:
-
-# Enable Home Assistant API
-api:
-  encryption:
-    key: "Mc0aA="
-
-ota:
-  - platform: esphome
-    password: "4f84b5a8"
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
-  ap:
-    ssid: ${friendly_name} "Fallback Hotspot"
-    password: ${friendly_name}123
-
-captive_portal:
-
-text_sensor:
-  - platform: wifi_info
-    ip_address:
-      name: "ESP IP Address"
-
+# The product is enclosed in metal.. It might be a good idea to check that it has enough signal.
 sensor:
-  - platform: uptime
-    name: "Uptime"
-    unit_of_measurement: minutes
-    filters:
-      - lambda: return x / 60.0;
-
   - platform: wifi_signal
     name: "Signal"
     update_interval: 60s
@@ -138,42 +99,11 @@ light:
     blue: blue
     warm_white: warm_white
     cold_white: cold_white
-    cold_white_color_temperature: 6536 K
+    cold_white_color_temperature: 6500 K
     warm_white_color_temperature: 2000 K
     color_interlock: True
-    effects:
-      - random:
-          transition_length: 2.5s
-          update_interval: 3s
-      - random:
-          name: Random Slow
-          transition_length: 10s
-          update_interval: 5s
-      - pulse:
-          name: "Fast Pulse"
-          transition_length: 0.5s
-          update_interval: 0.5s
-          min_brightness: 0%
-          max_brightness: 100%
-      - pulse:
-          name: "Slow Pulse"
-          transition_length: 500ms
-          update_interval: 2s
-      - pulse:
-          name: "Asymmetrical Pulse"
-          transition_length:
-            on_length: 1s
-            off_length: 500ms
-          update_interval: 1.5s
-      - pulse:
-          name: "Apple Breath"
-          transition_length:
-            on_length: 2.5s
-            off_length: 1.5s
-          update_interval: 4.5s
-          min_brightness: 20%
-          max_brightness: 40%
-      - flicker:
-          alpha: 90%
-          intensity: 3%
 ```
+
+## Notes:
+
+The lamp is enclosed in metal, which may affect Wi-Fi signal strength. Ensure it is close to the router or use a repeater if needed.
